@@ -261,3 +261,9 @@ cat readme.md # mistake still there, but unstaged
 git checkout -- readme.md  
 cat readme.md # yes!  
 git status
+
+# 2018-09-26, GitHub to track and share versions   
+
+To reverse a git directory back into a normal (non-git) directory:  
+- delete the .git file
+
