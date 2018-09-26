@@ -92,7 +92,10 @@ The first assignment is due 9/17/18. Just do exercise 1 in the homework.
 - **ps** - shows me the processes that are going on. Each process should have it's own unique process number. You can kill something from -1 (weak) to -9 (strong).
 - "&" at the end of a command can send a process to the background (return the prompt) automatically.
 
-<ps -u katbraun> allows you to see all list of processes that you started.
+```
+ps -u katbraun
+```
+allows you to see all list of processes that you started.
 
 # 2018-09-17, regular expressions, grep and find 
 
@@ -115,9 +118,13 @@ Mac - BSD tools. Linux - GNU tools. Mainly differ in how they treat 'extended' r
 GNU version of linux commands are g(command). Eg ggrep, gls, gcat etc. 
 
 Quotes with shell commands:  
-<echo \*.txt>  
+```
+echo \*.txt
+```  
 this expands the wildcard before running echo. 
-<echo "\*.txt">
+```
+echo "\*.txt"
+```
 
 *Single quotes are "very protective". Variables do not get replaced by their values.* 
 
@@ -127,14 +134,17 @@ this expands the wildcard before running echo.
 ## Exercise in tb1.fasta  
 Find all instances where characters are not A,C,T,G,a,c,t,g
 Fist exclude the first line. Then find grep to find anything that is not ACTGactg.  
-My code: <grep -v ">gi|" tb1.fasta | grep -o --color [^A,C,T,G]>
+My code:  
+```
+grep -v ">gi|" tb1.fasta | grep -o --color [^A,C,T,G]
+```
 
 ## Software carpetnry grep/find key points: 
-1. <find> finds files with specific properties that match patterns. 
-2. <grep> selects lines in files that match patterns. 
-3. --help is a flag supported by most bash commands and programs that can be run from within Bash, to display more info on how to use these commands or programs. 
-4. <man command> displays the manual page for a given command. 
-5. $(command) insrts a command's output in place. 
+1. ```find``` finds files with specific properties that match patterns. 
+2. ```grep``` selects lines in files that match patterns. 
+3. ```--help``` is a flag supported by most bash commands and programs that can be run from within Bash, to display more info on how to use these commands or programs. 
+4. ```man command``` displays the manual page for a given command. 
+5. ```$(command)``` insrts a command's output in place. 
 
 # 2018-09-19, grep 
 
@@ -145,10 +155,15 @@ My code: <grep -v ">gi|" tb1.fasta | grep -o --color [^A,C,T,G]>
 - If I have questions in the future it is okay to open an issue on GitHub and tag Cora and/or Dr. Ane. 
 
 Download partitionfinder_bestscheme.txt. Write a grep command to search through and see how many times we see GTR + G.  
-<grep -c "| GTR+G " partitionfinder_bestscheme.txt>  
+```
+grep -c "| GTR+G " partitionfinder_bestscheme.txt>
+```  
 68 (this is the correct answer) 
 
-<grep '^$' filename> this would show all of the blank lines. 
+```
+grep '^$' filename
+``` 
+this would show all of the blank lines. 
 
 Examples at the end of the grep page are really tailored to exercise 2. Take a careful look at those. 
  
@@ -170,10 +185,10 @@ section 1.1
 
 To get code blocks, indent with 4 spaces (or 8 spaces if within a list).  
 Use 3 backticks, possibly followed by the language name:  
-'''r
+```r
 foo <-function(x){x+1} # R function "foo", just adds 1
 food(2)
-'''  
+```  
 **To force a new line, end you line in 2 spaces**  
 
 ## Rendering a markdown file to other formats:   
@@ -190,8 +205,11 @@ Within each project directory
 - manuscript 
 
 *Exercise:* write a one-liner to count the number of “Subsets” whose “Best Model” is GTR+G in this file: partitionfinder_bestscheme.txt (68 out of 95):  
-<grep -oc 'GTR+G ' partitionfinder_bestscheme.txt> (answer = 68)  
-I put this file in /Users/katbraun/Desktop/bds-files/partitionfinder_bestscheme
+```
+grep -oc 'GTR+G ' partitionfinder_bestscheme.txt
+``` 
+(answer = 68)  
+I put this file in: /Users/katbraun/Desktop/bds-files/partitionfinder_bestscheme
 
 # 2018-09-24, github and git at the command line
 
@@ -204,14 +222,16 @@ Track versions of a project with git
 - each collaborator has the project on her/his local machine, and another remote copy of the project is on GitHub. Collaborators can "pull" from GitHub and "push" to GitHub
 
 Each snapshop has an address and a comment: "commit address"  
-<git checkout "commit address">  
+```
+git checkout "commit address"
+```  
 Additions are in green. Deletions are in red. 
 
 The only file you might want to look at in .git/ is the configuration file - text file.  
-git add (to staging area, intermediate picture)  
-git diff (show me the difference between new version and staged area)  
-git diff --staged (show me the difference between staging area and previous commit)  git commit (send files in the staging area to repo)  
-git log --oneline (list of recent git activity), --pretty=oneline
+```git add``` (to staging area, intermediate picture)  
+```git diff``` (show me the difference between new version and staged area)  
+```git diff --staged``` (show me the difference between staging area and previous commit)  git commit (send files in the staging area to repo)  
+```git log --oneline``` (list of recent git activity), --pretty=oneline
 
 ## Commit messages:  
 little message that you include with each commit made. These are very important when you are trying to recover previous version. 
@@ -221,13 +241,11 @@ If more explanations are needed, add one blank line. Then your explanation parag
 Informativeness - helps to recover old versions.   
 
 ## Separation of title vs paragraph.  
-git commit will open a text editor and then it's easier to see your new line  
+```git commit``` will open a text editor and then it's easier to see your new line  
 -a option to add all changes in tracked file to the commit (combines add and commit)
 
 ## Looking at Git history:  
-git show (shows the actual content of the commit, actual differences, only the last commit)  
-git log  
-git log --pretty=oneline --abbrev-commit
+```git show``` (shows the actual content of the commit, actual differences, only the last commit)    
 
 ## Use git to move or delete tracked files  
 git mv "old name" "new name"  
@@ -244,26 +262,53 @@ touch gitignore
 - MS word documents (they are not plain text files)
 
 ### If you make a mistake: 
-echo "todo: ask sequencing center about adapters" > readme.md  
-cat readme.md # oops  
-git status    # git tells us how to undo our change  
-git checkout -- readme.md # to checkout 'readme.md' from the last commit  
-cat readme.md # yes!  
-git status
+```echo "todo: ask sequencing center about adapters" > readme.md```  
+```cat readme.md``` # oops  
+```git status```    # git tells us how to undo our change  
+```git checkout -- readme.md``` # to checkout 'readme.md' from the last commit  
+```cat readme.md``` # yes!  
+```git status```
 
 ### If the mistake has been staged:  
-echo "todo: ask sequencing center about adapters" > readme.md  
-git add readme.md  
-git status  # again, follow git's instructions  
-git reset HEAD readme.md  
-git status  
-cat readme.md # mistake still there, but unstaged  
-git checkout -- readme.md  
-cat readme.md # yes!  
-git status
+```echo "todo: ask sequencing center about adapters" > readme.md```  
+```git add readme.md```  
+```git status```  # again, follow git's instructions  
+```git reset HEAD readme.md```  
+```git status```  
+```cat readme.md``` # mistake still there, but unstaged  
+```git checkout -- readme.md```  
+```cat readme.md``` # yes!  
+```git status```
 
 # 2018-09-26, GitHub to track and share versions   
 
 To reverse a git directory back into a normal (non-git) directory:  
 - delete the .git file
 
+```git push```, pushes to GitHub  
+```git pull```, pulls from GitHub  
+```git clone```, clones a GitHub repository to your local computer  
+```git merge```, merge recent changes  
+```git remote -v```, tell me about any remote repositories 
+
+Pull, will fetch and merge. 
+Fetch, will fetch. c
+
+Created an alias for this: **gl**  
+```git log --abbrev-commit --graph --pretty-oneline --all --decorate```
+
+It is very important to **pull** from GitHub often.  
+Before you try to pull, commit your changes so you don't lose your work. Any change to an uncommitted file would stop the pull update. To do this:  
+```
+git pull origin master
+```  
+You can use ```git status``` to determine which files have conflicts that need to be manually resolved.  
+- merge commits have 2 parents, unlike usual commits
+- if you feel overwhelmed during a merge, do ```git merge --abort``` and start the various merge steps from scratch
+- remember: ```git status``` gives instructions
+
+## For next time:  
+- finish and create your own github repo for your course notes, and to push your local repo there, if not done in class already
+- open an issue on your github course note repo, where you tag the instructor + TA, with a comment on one particular thing that you learned in the course so far; use at least 1 markdown syntax feature when you write this github issue.
+- do **shell scripts from the software carpentry: how to pass arguments to a script**
+- do **“tracking a species” from the software carpentry:** combines grep, cut, pipes and script arguments usage.

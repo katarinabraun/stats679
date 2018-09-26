@@ -21,8 +21,8 @@ The Shell is a programming language that is used at the terminal interface to sp
 6. **whoami** - get your username. 
 7. **mkdir** - make a directory. 
 8. **rmdir** - remove a directory. 
-9. **mv** - move (and rename). mv <from_file> <to_file>
-10. **cp** - copy. cp <from_file> <to_file>
+9. **mv** - move (and rename). ```mv <from_file> <to_file```
+10. **cp** - copy. ```cp <from_file> <to_file>```
 11. **touch** - create a blank file. 
 12. **diff** - difference. 
 13. **wc** - word count.  
@@ -88,34 +88,72 @@ The Shell is a programming language that is used at the terminal interface to sp
 
 
 1. For loop:  
-for variable in *; do; echo will analyze this thing next: $variable; ls $variable; done
+```bash
+for variable in *
+do
+   echo will analyze this thing next: $variable
+   ls $variable
+done
+```
 
 2. Check to see if a program is going to run on 'correct' files using ECHO:  
-for datafile in NENE*[AB].txt; do; echo $datafile; done  
+```bash
+for datafile in NENE*[AB].txt
+do
+    echo $datafile
+done
+```
+
 If correct, then:  
-for datafile in NENE*[AB].txt; do; echo $datafile; bash program $datafile; done
+```bash
+for datafile in NENE*[AB].txt
+do
+    echo $datafile
+    bash program $datafile
+done
+```
 
 3. Print the last 5 commands:  
+```bash
 history | tail -n 5
+```
 
 4. $ for species in cubane ethane methanedo; for temperature in 25 30 37 40; do; mkdir $species-$temperature; done; done
 
 5. Command substitution with $(): to pass the list of files found to another command  
+```bash
 grep xxx $(find yyy)
+```
 
 6. Find all files:  
-grep '^$' filename 
+```bash
+grep '^$' filename
+```
 
 7. For loop to count the number of occurences of a words in a file:  
-for sis in Jo Meg Beth Amy; do; echo $sis:; grep -ocw $sis LittleWomen.txt; done  
+```bash
+for sis in Jo Meg Beth Amy
+do
+    echo $sis:
+    grep -ocw $sis LittleWomen.txt
+done
+```  
 OR  
-for sis in Jo Meg Beth Amy; do; echo $sis:; grep -ow $sis LittleWomen.txt | wc -l; done
+```bash
+for sis in Jo Meg Beth Amy
+do
+   echo $sis:
+   grep -ow $sis LittleWomen.txt | wc -l
+done
+```
 
 8. Brach expansion to create a directory structure in one step:  
+```bash
 mkdir -p zmays-snps/{data/seqs,scripts,analysis}
+```
 
 Immediately trash the standard output of a script:  
-myprogram > /dev/null 
+```myprogram > /dev/null``` 
 
 
 # Python. 
