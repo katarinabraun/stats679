@@ -311,4 +311,100 @@ You can use ```git status``` to determine which files have conflicts that need t
 - finish and create your own github repo for your course notes, and to push your local repo there, if not done in class already
 - open an issue on your github course note repo, where you tag the instructor + TA, with a comment on one particular thing that you learned in the course so far; use at least 1 markdown syntax feature when you write this github issue.
 - do **shell scripts from the software carpentry: how to pass arguments to a script**
-- do **“tracking a species” from the software carpentry:** combines grep, cut, pipes and script arguments usage.
+- do **“tracking a species” from the software carpentry:** combines grep, cut, pipes and script arguments usage. 
+
+**Key points from Software Carpentry: Shell Scripts**  
+- save commands in files (sually called shell scripts) for re-use. 
+- `bash filename` runs the commands saved in a file 
+- `$@` refers to all of a shell script's command-line arguments
+- `$1`, `$2`, etc., refer to the first command-line argument, the second command-line argument, etc. 
+- Place variables in quotes if the values might have spaces in them. 
+- Letting users decide what fiels to process is more flexible and more consistent with built-in Unix commands.
+
+# 2018-10-01, back to shell tools – sed, cut 
+
+Comments from Prof Ane:  
+- in your scripts, make your comments shorter
+- if your script will only pull out hmax values between 0 - 9, document that in your script
+- comments should be related to purpose, not mechanics
+- use descriptive variable names, but don't use variable names that are too long. To avoid this issue, use a comment to describe what the variable is the first time you use it
+    - st=$(...) # st = snaq time
+- lines should be <80 characters in order to effectively use Git track changes
+
+**less**
+- `-S` option controls line wrapping 
+
+**cut**
+- `-f2`, `-f 1,3`, `-f1-3`
+- `-c2` to cut (extract) the second character, not the second field (column)
+- `-d` to change the delimiter between column fields intead of tab
+- `-d ' '` for a space, `-d`, `-d ,` for a comman (CSV files)
+
+**sort**  
+- `-k` to sort by specific columns (keys). 
+- `-n` to sort numerically 
+- `-r` to sort in reverse order
+- `-c` to check fi the file is sorted (this is fast)
+- `-t` or `-t ","` to change the seperator to a comma instead of tab (default)
+
+**Exercise:**  
+Extract all the features (and counts) for gene “ENSMUSG00000033793”, from file Mus_musculus.GRCm38.75_chr1.gtf
+```bash
+grep "ENSMUSG00000033793" Mus_musculus.GRCm38.75_chr1.gtf | cut -f 3 | sort | uniq -c
+```
+- remember the uniq will only remove duplicates that are adjacent, that is why you have to sort first.  
+
+**column**  
+This is nice to view csv files on the command line screen.  
+- `-s","` sets the separator to a comma instead of a tab (default)
+
+**basename & dirname**  
+- `basename` and `dirname` extract file/folder name and its path from a stinrg (the file/folder need not exist)
+- `-s suffix`: to removed known suffix (like an extension)
+- basename $(pwd)
+- dirname $(pwd)
+- basename "relative/path/to/myfile.txt"
+- dirname  "relative/path/to/myfile.txt"
+- basename "/absolute/path/to/myfolder"
+- dirname  "/absolute/path/to/myfolder"
+- dirname "myfile.txt" # current directory: .
+- basename -s "txt" "relative/path/to/myfile.txt"
+- basename -s "txt" "relative/path/to/myfile.txt"
+- basename -s ".txt" "relative/path/to/myfile.txt"
+- basename -s "le.txt" "relative/path/to/myfile.txt
+
+**sed**  
+This is a stream editor. Uses regular expressions like grep. The most important thing to learn for sed is the 'find' and 'replace' function.
+
+Usage:  
+```bash
+sed s/pattern/replacement/ filename > newfile # do NOT redirect to input file!
+```  
+```bash
+sed -i s/pattern/replacement/ filename # for in-place replacement
+```  
+**go through this section again and add notes here and in sripts file 
+
+
+**Exercise:**  
+extract the unique transcript names in the data file Mus_musculus.GRCm38.75_chr1.gtf: string after “transcript_id”.
+
+```bash
+grep -E -o 'transcript_id "\w+"' Mus_musculus.GRCm38.75_chr1.gtf |
+  cut -f2 -d" " | sed 's/"//g' | sort | uniq | head
+```
+or
+```bash
+grep -v "^#" Mus_musculus.GRCm38.75_chr1.gtf |
+  sed -E -n 's/.*transcript_id "([^"]+)".*/\1/p' | sort | uniq | head
+```
+**Message**: try to be specific, this will ensure that your code is more robust. 
+
+**Greedy matching**: problem if we try to capture between quotes like this `"(.+)"`
+
+- I completed the `sed` exercise for participation points on 10/01/18 
+
+# 2018-10-03, shell scripts, if  
+
+**For Wed 10/10 8pm**: exercise 3 of homework assignment 1, including submission via github issue  
+**For Mon 10/14**: peer reviews 
