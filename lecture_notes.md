@@ -407,4 +407,177 @@ grep -v "^#" Mus_musculus.GRCm38.75_chr1.gtf |
 # 2018-10-03, shell scripts, if  
 
 **For Wed 10/10 8pm**: exercise 3 of homework assignment 1, including submission via github issue  
-**For Mon 10/14**: peer reviews 
+**For Mon 10/14**: peer reviews
+
+## Command-line arguments 
+
+Command-line arguments stored in variables `$1`,`$2` etc.  
+name of script `$#`: number of arguments  
+
+```(head -n 2; tail -n 2) < "#1"```
+- `<` redirects the standard input, and subshell between `()`: both head and tail get the standard input. 
+
+- ```set -e``` # script terminates if any command exits with non-zero status
+- ```set -u``` # terminates if any variable is unset
+- ```set -o``` pipefail # terminates if command within a pipes exits unsuccessfully
+
+Use this, called the "shebang" to tell the computer to use 'bash' in the 'bin' directory to run this script if the user doesn't input 'bash': **#!/bin/bash**. 
+- would execute the script like this ```./myscript.sh filename```, instead of ```bash myscript.sh filename```
+
+To use the above tool you still have to use "./" prior to script, UNLESS you add "./" to the $PATH. You do this by creating a link from one of the bash directories to the directory of the current file.  
+
+**~/bin** directory: 
+- create one if you don’t already have one, put your own programs there, to call them from anywhere.
+- add it to your PATH variable. Do you see it when you do ```echo $PATH?```
+- if not: edit your file ```~/.bash_profile```, add the line export ```PATH="$PATH:~/bin"```, run source ```~/.bash_profile``` or simply exit your shell and re-open it.
+
+I tried going through this on my own and am still having trouble with adding the bash script to my ~/bin and running it from anywhere. **I submitted an issue to ask Prof. Ane and Cora within my course note repository on GitHub.**
+
+**Permissions**:
+- -rwxrwxrwx
+- "-" means file, "D" means directory
+- "r" read, "w" write, "x" execute
+- first set: user
+- second set: group
+- third set: everyone logged onto this machine
+
+Change permissions for script.sh to add writing permissions:  ```chmod u+x script.sh```
+- `u`, `g`, `o`: user, group, other; `a` for all
+- `+` or `-` to add or remove permissions 
+- `r`, `w`, `x`: to read, write, execute 
+
+## arithmetic expansion  
+
+- Use ```(())```. integers only. 
+- If you need anything elaborate, it means that you should use Python, Perl, or R.
+
+```bash
+i=3678
+echo "my variables is: i=$i"
+((i = i+6))
+echo "I incremented i by 6: now i=$i"
+((i--))
+echo "I decremented i by 1: now i=$i"
+((i++)); echo "I incremented i by 1: now i=$i"
+((i+=1)); echo "I incremented i by 1 again: now i=$i"
+((i/=5)); echo "finally, I divided i by 5: now i=$i"
+echo $((i++))
+echo $i # i++ executes the command and increments i after
+echo $((++i))
+echo $i # ++i increments i first, then executes the command
+```
+
+## if statements and checks 
+
+| **test expressions** | meaning |
+|----------------------|---------|
+```-z str``` | string ```str``` is empty
+```str1 = str2``` | strings ```str1```and ```str2``` are identical. different: ```str1 != str2```
+```int1 -eq int2 ``` | integers ```int1``` and ```int2``` are equal. not equal: ```int1 -ne int2```
+```int1 -lt int2``` | integer int1 is less than int2. greater: ```int1 -gt int2```
+```int1 -le int2``` | integer int1 is less than or equal to ints. greater than or equal: ```int1 -ge int2```
+```-de thing``` | ```thing``` is a directory. file: ```-f```, link: ```-h```
+```-e thing``` | ```thing``` exists
+```-r rile``` | ```file``` is readable, writable ```-w```, executable ```-x```
+```!``` | negation
+```-o```, `-a`, `!` | or, and: to separate expressions within a test `[...]` (*not* short-circuit)
+`( )` | to group tests
+`||`, `&&` | or, and: to separate different tests (short circuit)
+
+**Examples**: 
+```bash
+if [ $i -lt 800 ] # the spaces after `[` and before `]` are REQUIRED
+then
+  echo "i is less than 800"
+else
+  echo "i is not less than 800"
+fi
+```
+
+Let's test and check for at least one argument (file name), and if so, test that this file is readable: 
+```bash
+if [ $# -lt 1 -o ! -f $1 -o ! -r $1 ]
+then
+  echo "error: no argument, or no file, or file not readable"
+  exit 1 # exit script with error code (1). 0 = successful exit
+fi
+```
+- you don't need an "else" section, only a "then" section
+- exit status 1 means error, exit status 0 means 'all good'
+
+```bash
+if [ $# -lt 1] || [ ! -f $1 ] || [! -r $1]
+then
+echo "error: no argument, or argument is not a file, or file is not readable"
+exit 1 # exists script with error code (1). 0 = successful exit
+fi
+```
+
+- **exit code**: 0 if successful, 1 if unsuccessful (for the shell, 0=true, 1=failse!!)
+- when you check for equality with ```=``` you have to have spaces around the equal sign
+
+# 2018-10-08, git branches
+
+**make sure to check Canvas announcements**
+Homework 1.3 is due 8p on 10/10.
+
+**Warnings**
+- do **Not** update your github repo by uploading files from the browser
+- git desktop does not always let you control and see everything: prefer the command line
+- do not track/commit ```.Rhistory``` files, or ```.DS_store``` files, or tmp files. 
+
+```git checkout 832aebd -- readme.md```
+- this will bring back the 832aebd version of the readme.md file
+- can use the git log address = commit-sha or a tag of you made a tag for that commit 
+
+```git checkout master -- readme.md```
+- to get back to the most recent updated version of the readme.md file 
+
+```git checkout```
+- look at earlier stages of the *entire project* 
+
+```git checkout master```
+- restore the most recent version of the entire project 
+
+## branches
+Branches are very useful to easily switch back and forth between different versions. Each version can still evolve.  
+Branches are like pointers. They do not hold info. Commits do. 
+
+```git branch branch-name``` to create new branch
+```git checkout branch-name``` to switch to new branch
+```git branch`` list all the branches
+
+## remote branches
+We can use *remote* branches too. You could pull my changes, including the new “readme-changes” branch, and switch to it if you wanted to collaborate on this branch.
+
+```git branch -vv``` show local and remote branches and what they are tracking  
+```git push -u origin new-branch``` -u = upstream, push new branch
+```git fetch --all``` get new branches from GitHub
+```git merge branch``` to merge branch with master
+- it is important to be on the branch "that will have the change" ... usually this means being on master 
+
+```git branch -a``` see all remote and local branches 
+
+After we have merged a branch back with master, it is good practice to cleanup branches that aren't being used anymore.  
+```git branch -d old-branch-name```
+```git fetch --prune``` fetch everything, including branch deletions 
+
+- ```git commit --amend``` to add change the last commit message, but **do not** do this if you already pushed your change to GitHub
+- ```git revert``` to revert changes. To undo the last commit ```git revert HEAD```. This would create a new commit whose actions would cancel the actions of the last commit. 
+- To undo the changes of the second-to-last commit (but not the changes in the last commit), we would do: ```git revert HEAD~1```. This is safe, and much recommended if you already pushed to github the commits to be undone.
+- ```git reset``` and ```git rebase``` it is best to avoid these commands because they change the history file, but these are fine to do on our own laptops prior to commiting anything 
+
+It is not good to erase GitHub history or SHAs because it makes it really difficult to collaborate. 
+
+## SHA checksums
+
+**SHA** = security has algorithm  
+1 byte = 8 bits, 1 nibble = 4 bits    
+It's a good idea to record the SHA values of important data files as metadata (in readme file). 
+
+```bash
+$ echo "this sentence is super cool" | shasum
+93aff6c8139fff6855797afc8ea7a7513ffabb6f  -
+$ echo "this sentence is duper cool" | shasum
+97c250becdaa49c62721478c7f82d116e1039e0e  -
+```

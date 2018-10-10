@@ -107,6 +107,44 @@ Special variable **$@** means "all of the command-line arguemtns to the shell sc
 
 The `-x` flag cuases `bash` to run in debug mode. This prints out each command as it is run, which will help you to locate errors. 
 
+# If statements and checks 
+
+| **test expressions** | meaning |
+|----------------------|---------|
+```-z str``` | string ```str``` is empty
+```str1 = str2``` | strings ```str1```and ```str2``` are identical. different: ```str1 != str2```
+```int1 -eq int2 ``` | integers ```int1``` and ```int2``` are equal. not equal: ```int1 -ne int2```
+```int1 -lt int2``` | integer int1 is less than int2. greater: ```int1 -gt int2```
+```int1 -le int2``` | integer int1 is less than or equal to ints. greater than or equal: ```int1 -ge int2```
+```-de thing``` | ```thing``` is a directory. file: ```-f```, link: ```-h```
+```-e thing``` | ```thing``` exists
+```-r rile``` | ```file``` is readable, writable ```-w```, executable ```-x```
+```!``` | negation
+```-o```, `-a`, `!` | or, and: to separate expressions within a test `[...]` (*not* short-circuit)
+`( )` | to group tests
+`||`, `&&` | or, and: to separate different tests (short circuit)
+
+**Examples**: 
+```bash
+if [ $i -lt 800 ] # the spaces after `[` and before `]` are REQUIRED
+then
+  echo "i is less than 800"
+else
+  echo "i is not less than 800"
+fi
+```
+
+Let's test and check for at least one argument (file name), and if so, test that this file is readable: 
+```bash
+if [ $# -lt 1 -o ! -f $1 -o ! -r $1 ]
+then
+  echo "error: no argument, or no file, or file not readable"
+  exit 1 # exit script with error code (1). 0 = successful exit
+fi
+```
+- you don't need an "else" section, only a "then" section
+- exit status 1 means error, exit status 0 means 'all good'
+
 # Shell loops and scripts: 
 - a variable named variable is later, used with $variable
 - use 'echo' to print info during execution of the scripts
@@ -139,6 +177,8 @@ do
     bash program $datafile
 done
 ```
+
+# Example
 
 3. Print the last 5 commands:  
 ```bash
