@@ -581,3 +581,184 @@ $ echo "this sentence is super cool" | shasum
 $ echo "this sentence is duper cool" | shasum
 97c250becdaa49c62721478c7f82d116e1039e0e  -
 ```
+
+# 2018-10-10 awk, parameter expansion, wget & curl
+
+For next time: peer reviews. Look at 2 other people's homework. Will get tagged on two issues. Send the grades via canvas. Go to the issue and provide constructive feedback. Send the grades (without comments) to canvas.  
+
+* add notes on 'some other git subcommands' from Monday's lecture  
+
+You can search in visual code studio using regex (click on *)! This is a really cool way to quickly test whether my regular expressions are working as expected. 
+
+## awk: quick test processing  
+More powerful than sed, but can do some similar things. Good for tabular data. 
+
+- command lines: `awk pattern { action } filename`
+- pattern: expression or regexp pattern (in slashes, e.g. `/^chr\d/)`. If true or match for a given line (record): the actions are run. If no stated action: the line is printed.
+- `a ~ b` true if `a` matches regexp pattern `b`. no match: `a !~ b`
+- combine patterns with `&&` (and) and `||` (or)
+- special patterns: BEGIN and END
+- variables: `$0` for entire record (line), `$1` for first field (columns)’s value, `$2` for second field’s value, etc.
+- `NR` = current record (line) number
+- `NF` = number of fields (columns) on current line
+- can do arithmetic operations on field values, standard comparisons (`<=`, `==` etc.)
+- extra fields can be printed
+- new variables can be introduced, modified, used (no $ to use them: not like shell language)
+- actions: `if`, `for`, `while` statements can be used
+- many built-in functions, like `exit`, `sub(regexp, replacement, string)` `substr(string, i, j)` or `split(string, array, delimiter)`
+- default field (column) separator in input file: tab. For csv file: change to comma with `-F","`
+- two pattern-action pairs separated by `;`
+- new variable `feature` introduced: associative array. like list but indexed by keys (dictionaries in Python & Julia, hashes in Perl)
+- `for` loop, new variable `k` inside.
+
+Language for quick test-processing tasks on tabular data: `bioawk` for biological formats. There are special functions in `bioawk` for sequence data. 
+
+**Examples**: within bds-files/chapter-07...
+- action is in curly braces
+- pattern is not
+- everything has to be in single quotes 
+- awk doesn't know about shell variables, fix for this is to pass the variable fromt the shell to awk -t=$variable as an option before single quotes 
+- NR is the total number of records
+- a awk array is like a python dictionary (key and value)
+
+```bash
+awk '{ print $0 }' example.bed # like cat. No pattern: defaults to true
+awk '{ print $2 "\t" $3 }' example.bed # like cut -f2,3
+awk '$3 - $2 > 18' example.bed # prints lines (default action) if feature length > 18 (bed 0-based)
+threshold=18
+awk '$3 - $2 > $threshold' example.bed        # error: $ reserved for awk fields
+awk -v t=$threshold '$3 - $2 > t' example.bed # -v option: to define awk variables
+awk '$1 ~ /chr1/ && $3 - $2 > 10' example.bed
+awk '$1 ~ /chr2|chr3/ { print $0 "\t" $3 - $2 }' example.bed
+awk 'BEGIN{ s = 0 }; { s += ($3-$2) }; END{ print "mean: " s/NR };' example.bed # mean feature length
+awk 'NR >= 3 && NR <= 5' example.bed # lines 3 to 5 only
+awk -F "\t" '{print NF; exit}' Mus_musculus.GRCm38.75_chr1.bed # number of columns on 1st line
+grep -v "^#" Mus_musculus.GRCm38.75_chr1.gtf | awk -F "\t" '{print NF; exit}' # deals with header (start with #) in gtf file
+awk '/Lypla1/ { feature[$3] += 1 };
+    END { for (k in feature)
+    print k "\t" feature[k] }' Mus_musculus.GRCm38.75_chr1.gtf  | column -t
+```
+
+## parameter expansion  
+
+use `${variable_name extra stuff}`
+
+```bash
+var="coolname.txt.pdf.md"
+i=3678
+echo "var=$var and i=$i"
+echo "substrings of parameter values: ${i:1} and ${var:4:5}" # :offset:length
+echo "strip from the end: ${var%.*}"  # strips shortest occurrence
+echo "strip from the end: ${var%%.*}" # strips longest  occurrence
+echo "strip from beginning: ${var#*.}"  # strips shortest occurrence
+echo "strip from beginning: ${var##*.}" # strips longest  occurrence
+echo "substitute: ${var/cool/hot}"
+echo "delete:     ${var/cool}"
+```
+
+## getting data from the web: wget and curl  
+`wget` can download files from the web reproducibly 
+
+Can download files recursively: `-r`, but dangerous (aggressive). puts limits with options: 
+- `-l` to limit the level, or maximum depth: `-l 1` to go only 1 link away
+- `--accept-regex` to limit what's accepted using regular expression: here files whose names contain `.fasta` or `.txt`
+- `nd` or `--no-directory`: to not re-create the directory hierarchy
+- lots of other options, like: `--no-parent`, `-O`, `--user`, `--ask-password`, --`limit-rate`
+
+The host may block your IP address if you are downloading too muchh too fast. to avoid: use `--limit-rate=50k` to wait 1 sec between file downloads
+
+`curl` writes to standard output, best for one file at a time
+- can use more protocols, like `sftp`
+- can follows redirected pages with `--location`
+- some options: `-O`, `-o`, `--limit-rate`, `-I` or `--head`: to get header only. 
+- on ftp files: file size
+- `-s`: silent, no progress meter, no error messages `-#`: simple progress bar, no progress meter 
+
+# 2018-10-15, connecting to remote machine to run long jobs
+
+Can ask to have an account on the CHTC servers. 
+
+Edit files using nano or emacs within the ssh terminal window. 
+`-nw` = no new window for your text editor. 
+
+To avoid typing your password each time: copy the public key from your laptop (in `id_rsa.pub`) to the file `~/.ssh/authorized_keys` on the remote server. You created a key pair earlier for github, and copied your public key to your github profile.
+
+`scp`: secure copy. Same as `cp`, but need to provide user name, machine name and full path on the remote machine. works over ssh.
+slight difference between cp and scp:
+`cp -r log/ target/path/` copies the content of the log/ directory
+`cp -r log target/path/` copies the directory itself and its content. Do this one. 
+
+`-p` option preserves the original time that the file was created, instead of when it was copied. 
+`-r` option to recursively grab all the files within the listed directory. 
+
+## long-running jobs: nohub
+
+```mb mrBayes-run.nex > screenlog &```
+- redirects output and errors to screenlog 
+- `&` means I want the shell command to be returned 
+
+Now, I want to run this on the stat servers, log out, log back in tomorrow to get the results.
+
+log out: exit the terminal, all jobs started from it will be sent a “hang up” signal (SIGHUP), and killed. (recall: SIGKILL with `kill -9`, SIGINT with control-C, SIGTSTP with control-Z)
+`nohup`: will catch and ignore this hang-up signal
+- this means that the `nohup` will not touch the command that you indicate and that command will keep running even when you leave the server
+- `nohup` doesn't work on the stats servers because these servers use an AFS which has a very strong authentication system. When I log out, I lose my token, and my permissions to write to files, so my process runs but will have an error as soon as it will want to write to or read from a file.
+
+## tmux: terminal multiplexer
+
+Solves several challenges, like GNU `screen`
+- `tmux` sessions can be **detached** and **reattached**: detach, log out, log back in, re-attach
+- **multiple windows** in a session: say one with an editor, and another for shell commands
+
+Should I install `tmux`? I don't really ever work on remote servers other than Coltrane? What is Coltrane btw? 
+
+**tmux keys** | **actions**
+--------------|-------------
+`^a d` | detach
+`^a c` | create new window
+`^a |` or `^a -` | splits window vertically or horizontally (depends on config file)
+`a n` or `^a p` | go to next or previous window
+`^a` left arrow | go to left pane. other arrows for right, top, bottom panes
+`^a ?` | list all key sequences 
+`^a &`, `exit` or `logout` | kill current window
+`^a x` | kill current pane 
+
+These shortcuts depends on your tmux configurations. 
+
+## running many jobs
+- high performance: one (or few) very long job(s), possibly requiring a lot of memory
+- high throughput: very many job, each short (<24h). need program to distribute the jobs across very many different machines, and to get all output files back from these machines at the end.
+
+Resources on campus: ACI (advanced computing initiative), CHTC (center for high-throughput computing) and HTCondor for job scheduling. HPC cluster "lunchbox" in Stats:d uses slurm for job scheduling. **Get a CHTC account**.
+
+*Homework for W 10/17: install python*. I think I already have this done via conda. We are using Python 3.0, which is what I have, so I'll just doublecheck this before Wednesday. I have python 3.6.6 installed. I conda updated it on 10/15. 
+
+# 2018-10-17, intro to python 
+
+I'll have to find a partner to do this exercise with. 
+
+Homework for 10/17:
+- do python scw section 2: repeating actions with loops
+- git branch exercise:
+    - pair up with one other student in the class
+    - decide which git repository to work on: classe note repo from one or the other student, say student A
+    - student A goes to her/his own repository, clicks on “Settings” then “Collaborator” (github might ask for your password) then enters the gihub user name for student B, then click “Add collaborator”: to give push access to student B
+    - student A: start a new branch “A”, add something to it, push the branch to github
+    - student B: clone the repo on her/his laptop, start new branch “B”, add changes or new file to it, push the branch to github
+    - student A: pull branch B, add changes to it, push to github
+    - student B: pull branch A, add changes to it, push to github
+    - student A and B: each checkout master branch, merge his/her own branch into master, push to github. The second student doing this will need to pull first.
+    - both students: check the branches and merge on the repo’s network: click on “Insights” then “Network”; there should be at least 1 merge commit and labels for at least 3 branches: master, A and B.
+    - open a github issue with a link to the url with the “network” view; tag the instructor & TA on this issue, give both student names.
+
+You can run scripts in the termina from within Visual Studio Code. I am not sure if this works for Bash scripts. You can interact as if you were in the terminal as well. 
+
+You can run commands from with shift-enter from within Visual Studio code. 
+
+We also used iPython as well. There are helpful options in iPython with in the commandline. You can have more erros in your syntax with iPython(?) 
+
+The other option is to use Jupyter notebook. It's nice to view (in a browser). It will contain comments in markdown format. It can contain everything within one file. The files it generates are large, but that might be okay for me. This is really nice to create a comprehensive document for publication or collaboration. 
+
+Cecile uses fewer lines of code per cell. I wonder if that would be preferable. 
+
+Finish both Python software carpentry exercises as well as the GitBranch exercise. 
