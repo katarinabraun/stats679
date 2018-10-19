@@ -7,3 +7,7 @@ Computer programmer, mathemetician and rocket scientist.
 - Annie worked on one of the first-ever computer programs to enable navigation into space, The Centaur Project
 - In the 1970's Annie did important research on power plants and new electric batteries and created a computer program that would measure solar winds
 - Her work with electric batteries laid the foundation for today's hybrid vehicles
+
+# Kristin's notes
+
+Annie Easley is awesome.
