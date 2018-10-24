@@ -284,3 +284,394 @@ echo "chr12:74-431" | gsed -E 's/^(chr[^:]+):([0-9]+)-([0-9]+)/\1\t\2\t\3/'
 
 ## Python commands:
 1. 
+
+## Software Carptentry Notes
+
+### Analyzing Patient Data
+- assigning variables 
+- importing programs into python by using the `import` command 
+- visualizing data using matplotlib.pyplot 
+
+`data[30, 20]` accesss the element at row 30, column 20
+`data[0, 0]` element in the upper left corner. If we have an MxN array in Python, its indices go from 0 to M-1 on the first axis and 0 to N-1 on the second. 
+
+**Visualizing data**
+```Python
+import numpy
+import matplotlib.pyplot
+
+data = numpy.loadtxt(fname='inflammation-01.csv', delimiter=',')
+
+fig = matplotlib.pyplot.figure(figsize=(10.0, 3.0))
+
+axes1 = fig.add_subplot(1, 3, 1)
+axes2 = fig.add_subplot(1, 3, 2)
+axes3 = fig.add_subplot(1, 3, 3)
+
+axes1.set_ylabel('average')
+axes1.plot(numpy.mean(data, axis=0))
+
+axes2.set_ylabel('max')
+axes2.plot(numpy.max(data, axis=0))
+
+axes3.set_ylabel('min')
+axes3.plot(numpy.min(data, axis=0))
+
+fig.tight_layout()
+
+matplotlib.pyplot.show()
+```
+
+Key points: 
+- Import a library into a program using `import libraryname`.
+- Use the `numpy` library to work with arrays in Python.
+- Use `variable = value` to assign a value to a variable in order to record it in memory.
+- Variables are created on demand whenever a value is assigned to them.
+- Use `print(something)` to display the value of `something`.
+- The expression `array.shape` gives the shape of an array.
+- Use `array[x, y]` to select a single element from a 2D array.
+- Array indices start at 0, not 1.
+- Use `low:high` to specify a slice that includes the indices from `low` to `high-1`.
+- All the indexing and slicing that works on arrays also works on strings.
+- Use `# some kind of explanation` to add comments to programs.
+- Use `numpy.mean(array)`, `numpy.max(array)`, and `numpy.min(array)` to calculate simple statistics.
+- Use `numpy.mean(array, axis=0)` or `numpy.mean(array, axis=1)` to calculate statistics across the specified axis.
+- Use the `pyplot` library from `matplotlib` for creating simple visualizations.
+
+### Repeating Actions with Loops
+
+```Python
+word = 'lead'
+for char in word: 
+    print(char)
+```
+
+```Python
+for variable in collection: 
+    do things using variable
+```
+
+We can call the `loop variable` anything we like, but there must be a colon at the end of the line starting the loop, and we must indent anything we want to run inside the loop. Unlike many other languages, there is no command to signify the end of the loop body (e.g. `end for`); what is indented after the `for` statement belongs to the loop.
+
+Python has a built-in function called `range` that creates a sequence of numbers. range can accept 1, 2, or 3 parameters.
+
+If one parameter is given, `range` creates an array of that length, starting at zero and incrementing by 1. For example, `range(3)` produces the numbers `0, 1, 2`.
+If two parameters are given, `range` starts at the first and ends just before the second, incrementing by one. For example, `range(2, 5)` produces `2, 3, 4`.
+If `range` is given 3 parameters, it starts at the first one, ends just before the second one, and increments by the third one. For exmaple `range(3, 10, 2)` produces `3, 5, 7, 9`.
+Using `range`, write a loop that uses `range` to print the first 3 natural numbers:
+
+```Python
+for i in range(1,4):
+    print(i)
+```
+
+```Python
+result = 1
+for i in range(0,3):
+    result = result * 5
+print(result)
+```
+
+```Python
+newstring=''
+oldstring='Newton'
+for char in oldstring:
+    newstring = char + newstring
+print(newstring)
+```
+
+The built-in function `enumerate` takes a sequence (e.g. a list) and generates a new sequence of the same length. Each element of the new sequence is a pair composed of the index (0, 1, 2,…) and the value from the original sequence:
+```Python
+for i, x in enumerate(xs):
+    # Do something using i and x
+```
+The above code loops through `xs`, assigning the index to `i` and the value to `x`. 
+
+```Python
+x = 5
+cc = [2, 4, 3]
+y = 0
+for i, c in enumerate(cc):
+    y = y + x**i * c
+```
+
+Key points: 
+- use `for variable in sequence` to process the elements of a sequence one at a time
+- the body of a `for` loop must be indented
+- use `len(thing)` to determine the length of seomthing that contains other values 
+
+### Storing multiple values in lists
+
+Create a list: 
+`odds = [1, 3, 5, 7]`
+
+Select individual elements from lists by indexing them: 
+`print(odds[0], odds[-1])`
+
+Loop over a list: 
+```Python
+for number in odds: 
+    print(number)
+```
+
+Strings and numbers are inmutable. This does not mean that variables with string or number values are constants, but when we want to change the value of a string or number variable, we can only replace the old value with a completely new value.
+Lists and arrays, on the other hand, are mutable: we can modify them after they have been created. 
+The best way to understand inmutable vs mutable is to think about lists being poinsters to data. 
+
+Session: Have a and a = 5. Function will have it's own name-space.  
+Name-space: "add1_scalar". Info from session gets copied over to name-space for this new function. Then you can perform and print the output of the function without changing what a is equal to. 
+
+*Nested Lists* - list that contains lists. 
+Python stores a list in memory so be careful when copying the name of a list and then making changes within the new list - you may change the original. 
+
+A list can contain strings: 
+```Python
+my_list = []
+for char in "hello":
+    my_list.append(char)
+print(my_list)
+```
+Subsets of lists and strings can be accessed by specifying ranges of values in brackets, similar to how we accessed ranges of positions in a NumPy array. Eg: 
+
+```Python
+binomial_name = "Drosophila melanogaster"
+group = binomial_name[0:10]
+print("group:", group)
+
+species = binomial_name[11:24]
+print("species:", species)
+
+chromosomes = ["X", "Y", "2", "3", "4"]
+autosomes = chromosomes[2:5]
+print("autosomes:", autosomes)
+
+last = chromosomes[-1]
+print("last:", last)
+```
+
+Use negative indices to count elements from the end of a container (such as a list or string)
+`string[-4:]`
+`list[-4:]`
+
+You can get a subset of entries in a container by adding a third argument: 
+```Python
+primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]
+subset = primes[0:12:3]
+print("subset", subset)
+```
+> subset [2, 7, 17, 29]
+You can do the same thing for strings. 
+
+`+` usually means addition, but when used on strings or lists, it means "concatenate." 
+
+Key points: 
+- `[value1, value2, value3, ...]` creates a list
+- Lists can contain nay Python object, including lists (i.e., list of lists)
+- Lists are indexed and sliced with square brackets (e.g., list[0], and list[2:9]), in the same way as strings and arryas. 
+- Lists are mutable (i.e., their values can be changed in place)
+- Strings are immutable (i.e., the characters in them cannot be changed)
+
+### Analyzing Data from Multiple Files
+
+`import glob`
+The `glob` library contains a function, also called `glob`, that finds files and directories whose name match a pattern. We provide pattenrs as strings: the character `*` matches zero or more characters, while `?` matches any one character. We can use this to get the names of CSV files in the current directory: 
+
+```Python
+print(glob.glob('inflammation*.csv`))
+```
+
+```Python
+import numpy
+import matplotlib.pyplot
+
+filenames = sorted(glob.glob('inflammation*.csv'))
+filenames = filenames[0:3]
+for f in filenames:
+    print(f)
+
+    data = numpy.loadtxt(fname=f, delimiter=',')
+
+    fig = matplotlib.pyplot.figure(figsize=(10.0, 3.0))
+
+    axes1 = fig.add_subplot(1, 3, 1)
+    axes2 = fig.add_subplot(1, 3, 2)
+    axes3 = fig.add_subplot(1, 3, 3)
+
+    axes1.set_ylabel('average')
+    axes1.plot(numpy.mean(data, axis=0))
+
+    axes2.set_ylabel('max')
+    axes2.plot(numpy.max(data, axis=0))
+
+    axes3.set_ylabel('min')
+    axes3.plot(numpy.min(data, axis=0))
+
+    fig.tight_layout()
+    matplotlib.pyplot.show()
+```
+
+Plot the difference between the average of the first dataset and the average of the second dataset, i.e., the difference between the leftmost plot of the first two figures.
+
+```Python
+import glob
+import numpy
+import matplotlib.pyplot
+
+filenames = sorted(glob.glob('inflammation*.csv'))
+
+data0 = numpy.loadtxt(fname=filenames[0], delimiter=',')
+data1 = numpy.loadtxt(fname=filenames[1], delimiter=',')
+
+fig = matplotlib.pyplot.figure(figsize=(10.0, 3.0))
+
+matplotlib.pyplot.ylabel('Difference in average')
+matplotlib.pyplot.plot(data0.mean(axis=0) - data1.mean(axis=0))
+
+fig.tight_layout()
+matplotlib.pyplot.show()
+```
+Use each of the files once to generate a dataset containing values averaged over all patients:
+```Python
+filenames = glob.glob('inflammation*.csv')
+composite_data = numpy.zeros((60,40))
+for f in filenames:
+    # sum each new file's data into composite_data as it's read
+    #
+# and then divide the composite_data by number of samples
+composite_data /= len(filenames)
+```
+```Python
+import glob
+import numpy
+import matplotlib.pyplot
+
+filenames = glob.glob('inflammation*.csv')
+composite_data = numpy.zeros((60,40))
+
+for f in filenames:
+    data = numpy.loadtxt(fname = f, delimiter=',')
+    composite_data += data
+
+composite_data/=len(filenames)
+
+fig = matplotlib.pyplot.figure(figsize=(10.0, 3.0))
+
+axes1 = fig.add_subplot(1, 3, 1)
+axes2 = fig.add_subplot(1, 3, 2)
+axes3 = fig.add_subplot(1, 3, 3)
+
+axes1.set_ylabel('average')
+axes1.plot(numpy.mean(composite_data, axis=0))
+
+axes2.set_ylabel('max')
+axes2.plot(numpy.max(composite_data, axis=0))
+
+axes3.set_ylabel('min')
+axes3.plot(numpy.min(composite_data, axis=0))
+
+fig.tight_layout()
+
+matplotlib.pyplot.show()
+```
+
+Key points
+- use `glob.glob(pattern)` to create a list of files whose names match a pattern
+- use `*` in a pattern to match zero or more characters, and `?` to match any single character 
+
+### Making Choices
+
+We can ask Python to take different actions, depending on a condition, with an `if` statement. The second line of code uses the keyword `if` to tell Python we want to make a choise. If the test is true, the body of the `if` are executed. If the test is false, teh body of the `else` is executed instead. `elif` can be used to chain several tests together. 
+
+To test for equality: `==` (`=` is used to assign values)
+We can combine the test usign `and`, and `or`. `and` is only true if both parts are true. `or` is true if either part is true. 
+
+`True` or `False` are special words in Python called `booleans`, which represent trutch values. A statement stuch as `1 < 0` returns the value `False`, while `-1 < 0` returns the value True. 
+
+We can use these statements to check our script. What we are doing is asking Python to do something different, depending on the condition of our data. 
+Example: 
+
+```Python
+max_inflammation_0 = numpy.max(data, axis=0)[0]
+max_inflammation_20 = numpy.max(data, axis=0)[20]
+
+if max_inflammation_0 == 0 and max_inflammation_20 == 20:
+    print('Suspicious looking maxima!')
+elif numpy.sum(numpy.min(data, axis=0)) == 0:
+    print('Minima add up to zero!')
+else:
+print('Seems OK!')
+```
+
+`True` and `False` booleans are not the only values in Python that are true and false. In fact, any value can be used in an `if` or `elif`.
+'word is true'
+'non-empty list is true'
+'one is true' 
+
+Sometimes it is useful to check whether some condition is not true. The Boolean operator `not` can do this explicitly.
+'empty string is not true'
+'not not True is true'
+
+Python (and most other languages in the C family) provides in-place operators that work like this: 
+```Python
+x = 1  # original value
+x += 1 # add one to x, assigning result back to x
+x *= 3 # multiply x by 3
+print(x)
+```
+x = 6
+
+```Python
+positive_sum = 0
+negative_sum = 0
+test_list = [3, 4, 6, 1, -1, -5, 0, 7, -8]
+for num in test_list: 
+    if num > 0: 
+        positive_sum += num
+    elif num ==0:
+        pass
+    else: 
+        negative_sum += num
+print(positive_sum, negative_sum)
+```
+Here `pass` means "don't do anything". It's not really needed, but `pass` can be used in other ways as well. 
+
+Objective: 
+1. Loop over the names of the files
+2. Figure out which group each filename belongs 
+3. Append the filename to that list
+
+```Python
+for file in files: 
+    if file.startswith('inflammation-'):
+        large_files.append(file)
+    elif file.startswith('small-'):
+        small_files.append(file)
+    else:
+        other_files.append(file)
+print('large_files:', large_files)
+print('small_files:', small_files)
+print('other_files:', other_files)
+```
+
+Write a loop that counts the number of vowels in a character string: 
+
+```Python
+
+vowels = 'aeiouAEIOU'
+sentence = 'Mary had a little lamb.'
+count = 0
+for char in sentence: 
+    if char in vowels: 
+        count += 1
+
+print("The number of vowels in this string is " + str(count))
+```
+
+Key points: 
+- Use `if condition` to start a conditional statement, `elif condition` to provide additional tests, and `else ` to provide a default. 
+- The bodies of branches of conditional statements must be indented. 
+- Use `==` to test for equality. 
+- `X or Y` is only true if both `X` and `Y` are true. 
+- `X or Y` is true if either `X` or `Y`, or both, are true. 
+- Zero, the empty string, and the empty list are considered false; all other numbers, strings, and lists are considered true. 
+- `True` and `False` represent truth values. 

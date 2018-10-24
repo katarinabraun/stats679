@@ -762,3 +762,178 @@ The other option is to use Jupyter notebook. It's nice to view (in a browser). I
 Cecile uses fewer lines of code per cell. I wonder if that would be preferable. 
 
 Finish both Python software carpentry exercises as well as the GitBranch exercise. 
+
+# 2018-10-22, continuing intro to Python 
+
+HW: two more Python sections. 
+
+Int types vs float types. Float types have decimals.  
+Dot notation: `module.function` or  `object.method`. 
+Python is **0-indexed**.  
+[row, column] for numpy arrays
+
+Write a number in base 2: 
+- 1
+- 10
+- 11
+- 100
+- 101
+- 110
+- 111
+- 1000
+- 111...111, 2^64 - 1
+
+- + or - = 1 bit
+- 1.234 x 10 ^ 102 = 11 bits that represent the exponent
+- remaining bits can code the numbers 
+*important point: integers are fundamentally distinct from floats because they are coded and interpreted differently by your computer. 
+
+`string` vs `boolean`
+- boolean = true/false, only need one bit for this, false = 0, 0.1, none. Everything else = true. 
+- string  = 
+
+`If 1` interpreted as `if true`. 
+`1.0/3.0 == 1.0 - 2.0/3.0`
+> `False` because these values use floats, don't test exact equality using floats 
+
+`"%s %s hello %s" % (5, 5.8, "5")`
+- convert integers to a string 
+`"%d %d %d world" % (5, 5.8, int("51))`
+- write digits, 5 5 51 world
+- ?? 
+- writes 5.00 5.80 5.1e+01
+
+List is not the same as an array. List denoted by [stuff, in, here, is, the, list,]. Tuple = (,). Lists can be changed, tuples cannot be changed (**nonmutable**).
+
+Get started on section 3: storing multiple values in lists, added notes in commands_scripts.md. 
+
+Here are some more notes (GitHub was down on Monday): 
+
+## Python basic types, syntax, loops, and lists
+
+Basic types: 
+- int `14`
+- float `14.123`
+- string `"hello"`
+- bool (`True` or `False`)
+- None, complex `3+0.5j`
+- NoneType (`None`)
+
+`int`s and `float`s are fundamentally different in how they are coded. Consequence = *never test for exact equality of `float`s. 
+
+Can convert: `int`, `float`, `str`, `bool`. 
+
+To store multiple elements list `[10,20]`, tuple `(10,20)`, dictionary/hash `{"blue":10, "green":20}`, set `set([10,20])`
+- a list of lists is not the same as an array. `[1,2]` to create a list. 
+
+### Mutable vs inmutable objects: 
+
+Lists are mutable.  
+Strings, numbers, tuples are inmutable.  
+How `b=a` and changes to `b` can cause (or not) changes to `a`: 
+
+```Python
+a = "Darwin"
+b = a
+print("b=",b)
+b = "Turing" # does not change a, because a has immutable value
+print("now b=",b,"\nand a=",a)
+
+a = [10,11]
+b = a
+b[1] = 22 # changes the value that b binds to, so changes a too
+print("b=", b, "\nand a=",a)
+
+c = [a,a] # list of lists. Not numpy array!
+print(c)
+a[0] = -5
+print(c) # aahh!!
+
+b = a.copy() # various alternative options
+b = list(a)
+import copy
+a = [10,11]
+b = copy.copy(a)
+b[1] = 22 # changes the value that b binds to, does not change a
+print("b=", b, "\nand a=",a)
+```
+Get around this by using a **deep copy** vs a simple(shallow copy): 
+```Python
+a = [[10,11],[20,21]]
+print(a)
+b = copy.copy(a)
+b[0][0] = 50
+print("b=",b,"and a=",a)
+b[0] = [8,9]
+print("b=",b,"and a=",a)
+b = copy.deepcopy(a)
+print("now b is back to a: ",b)
+b[0][0] = 8
+print("b=",b,"and a=",a)
+```
+
+Functions that operate on mutable objects can change them in place. 
+
+### Syntax
+`:` to end starting lines, **indentation** to define blocks. 
+
+Important concepts:
+- binding of a name
+- scope of variables
+- local namespace
+
+### Conditions
+
+`==`, `<`, `>`, `not`, `and`, `or`. 
+Anything *other* than `False`, 0, `None`, empty string or empty list is considered `True` in a boolean context. 
+
+### Tuples
+
+Tuples are inmutable, unlike lists. Useful for
+- array sizes: `(60,40)` earlier
+- types of arguments to functions: like `(float, int)` for instance
+- functions can return multiple objects in a tuple
+- a tuple with a single value, say 6.5, is noted like this `(6.5,)`
+- they come in handy for exchanges: 
+
+```Python
+left = 'L'
+right = 'R'
+
+temp = left
+left = right
+right = temp
+print("left =",left,"and right =",right)
+
+left = 'L'
+right = 'R'
+
+(left, right) = (right, left)
+print("left =",left,"and right =",right)
+
+left, right = right, left
+print("now left =",left,"and right =",right)
+```
+
+### Some useful functions for lists
+
+`.append(x)`, `.extend(x)`, `.insert(i,x)`, `.reverse()`, `.pop()`, `.sort()`, `sorted()`
+
+### list comprehensive 
+`[xxx for y in z]` where `z` is a collection, `y` introduces a local variable name, and `xxx` is some simple function of `y` (typically)
+
+### some useful functions for strings 
+
+`.strip()`, `.split()`, `.replace()`, `.join()`, `.splilines()`
+
+### some useful modules
+
+numpy, time, matplotlib.pyplot, glob, re, sys, argparse
+
+`import module` or `import module as nickname` or `from module import function1, function2`, or `from module import *`
+
+### some useful functions/methods
+
+`type`, `print`, `range`, `list`, `del`, `len`, `abs`, `in`, `**` for power, `+` to concatenate strings or lists
+
+to check assumptions: `assert test_expression, "error message"`
