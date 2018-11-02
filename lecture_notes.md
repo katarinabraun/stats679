@@ -900,7 +900,7 @@ Tuples are inmutable, unlike lists. Useful for
 left = 'L'
 right = 'R'
 
-temp = left
+temp = left # without tuples you can use temporary variables
 left = right
 right = temp
 print("left =",left,"and right =",right)
@@ -908,10 +908,10 @@ print("left =",left,"and right =",right)
 left = 'L'
 right = 'R'
 
-(left, right) = (right, left)
+(left, right) = (right, left) # using a tuple, we can exchange the value of these variables more easily 
 print("left =",left,"and right =",right)
 
-left, right = right, left
+left, right = right, left # this works as well, it's recognized in python as a tuple 
 print("now left =",left,"and right =",right)
 ```
 
@@ -919,12 +919,81 @@ print("now left =",left,"and right =",right)
 
 `.append(x)`, `.extend(x)`, `.insert(i,x)`, `.reverse()`, `.pop()`, `.sort()`, `sorted()`
 
+```Python
+odds = [1, 3, 5, 7]
+print('odds before:', odds)
+odds.append(11) # adds 11 to the end of our list 
+print('odds after adding a value:', odds)
+```
+
+```Python
+odds = [1, 3, 5, 7, 11]
+del odds[0]
+print('odds after removing the first element:', odds)
+odds.reverse() # reverse the order of elements in the list 
+print('odds after reversing:', odds)
+a = odds.pop() # delete the last element from the list 
+print('odds after popping last element:', odds)
+print("this last element was",a)
+a = odds.pop(1) # get the value that we popped capture into the variable a
+print("popped element number 1 (2nd element):",a)
+odds
+```
+
+```Python
+odds = [1, 3, 5, 7]
+primes = odds # only copying the list address, chnaging primes will change odds
+primes += [2] # add to the list (primes and odds will be modified)
+print('primes:', primes)
+print('odds:', odds)
+
+counts = [2, 4, 6, 8, 10]
+repeats = counts * 2 # copies the list and writes each element twice 
+print(sorted(repeats))    # all integers, sorts the elements of the list 
+print(repeats) # unchanged
+repeats.sort() # modified in place
+print(repeats)
+print(sorted([10,2.5,4])) # sorted will only work if the type in the list is all the same 
+print(sorted(["jan","feb","mar","dec"]))  # all strings --> works
+print(sorted(["jan",20,1,"dec"]))  # error b/c not all elements are the same 
+```
 ### list comprehensive 
 `[xxx for y in z]` where `z` is a collection, `y` introduces a local variable name, and `xxx` is some simple function of `y` (typically)
 
+```Python
+counts = [2, 4, 6, 8, 10]
+counts + 5 # error
+[num+5 for num in counts] # for each number in counts, get num+5 and then make a list of those results, this did NOT change counts 
+counts
+for i in range(0,len(counts)): # I don't understand why you need the 'len' part here 
+    counts[i] += 5 # modifies "counts" in place
+counts
+```
 ### some useful functions for strings 
 
 `.strip()`, `.split()`, `.replace()`, `.join()`, `.splilines()`
+
+```Python
+taxon = "Drosophila melanogaster"
+genus = taxon[0:10]
+print("genus:", genus)
+gslist = taxon.split(' ')
+print(gslist)
+print("after splitting at each space: genus=",
+      gslist[0],", species=",gslist[1], sep="")
+print(taxon) # has not changed: immutable
+print(taxon.replace(' ','_'))
+print(taxon) # has not changed
+```
+
+```Python
+mystring = "\t hello world\n \n"
+mystring
+print('here is mystring: "' + mystring + '"')
+print('here is mystring.strip(): "' + mystring.strip() + '"')
+print('here is mystring.rstrip(): "' + mystring.rstrip() + '"') # right strip (or tRailing) only
+"     abc\n \n\t ".strip()
+```
 
 ### some useful modules
 
@@ -937,3 +1006,444 @@ numpy, time, matplotlib.pyplot, glob, re, sys, argparse
 `type`, `print`, `range`, `list`, `del`, `len`, `abs`, `in`, `**` for power, `+` to concatenate strings or lists
 
 to check assumptions: `assert test_expression, "error message"`
+
+# 2018-10-24, regular expressions in python
+
+## simple patterns and tools 
+
+useful functions on strings for simple things: `.strip`, `.split`, `.join`, `.replace`, `.index`, `.find`, `.count`, `.startswith`, `.endswith`, `.upper`, `.lower`,
+
+```Python
+a = "hello world"
+print(a.startswith("h"))
+print(a.startswith("he"))
+print("h" in a)
+print("low" in a)
+print("lo w" in a)
+
+print("aha".find("a")) # grep without regular expressions 
+print("hohoho".find("oh"))
+mylist = ["AA","BB","CC"]
+"coolsep".join(mylist)
+
+print(type(""))
+print(dir(""))
+```
+
+## regular expressions 
+
+use the **re library** and its functions `re.search`, `re.findall`, `re.sub`, `re.split` etc.
+recall regular expression syntax
+
+- `r''` to write the regular expression pattern, for “raw” strings: to read a \n as slash and an n, not as a newline character.
+- multipliers are greedy by default: `*`, `+`, `?`. Add `?` to make them non-greedy
+- info from match objects: `.group`, `.start`, `.end`
+when pattern not found: match object is `None`: False when converted to a boolean
+
+```Python
+import glob
+filenames = glob.glob('*.csv')
+print(filenames)
+
+import re
+mo = re.search(r'i.*n',filenames[0]) # using the search function from the module re, the star is greedy 
+print(mo)  # match object, stores much info. search: first instance only. saved the results of the object mo, found 12 matches, very greedy 
+print(mo.group()) # what matched, show us what was matched
+print(mo.start()) # where match starts: indexing start at 0, show us starting index
+print(mo.end())   # where it ends: index *after*!, show us ending index 
+
+mo = re.search(r'i.*?n',filenames[0]) # match not greedily, first n I will accept 
+print(mo)
+print(mo.group())
+print(mo.start())
+print(mo.end())
+```
+When there is not match, the matched object is None adn interpreted as False in a boolean context. 
+
+```Python
+sequences = ["ATCGGGGATCGAAGTTGAG", "ACGGCCAGUGUACN"]
+for dna in sequences:
+    mo = re.search(r'[^ATCG]', dna) # save search in matched object 
+    if mo: # if mo contains anything, convert to true, and do the next stuffs 
+        print("non-ACGT found in sequence",dna,": found", mo.group())
+```
+
+less efficient:
+```Python
+for dna in sequences:
+    if re.search(r'[^ATCG]', dna):
+        mo = re.search(r'[^ATCG]', dna)
+        print("non-ACGT found in sequence",dna,": found", mo.group())
+
+```
+Finding all instances: 
+```Python
+print(re.findall(r'i.*n',filenames[0])) # greedy. non-overlapping matches, didn't really find all matches, only found 'inflammation' 
+mo = re.findall(r'i.*?n',filenames[0])  # non-greedy, found 'in' and 'ion' 
+print(mo)
+mo
+
+for f in filenames:
+    if not re.search(r'^i', f): # if no match: search object interpreted as False
+        print("file name",f,"does not start with i")
+```
+## search and replace  
+`re.sub`, kinda like sed 
+- capture with parentheses in the regular expression
+- captured elements in `.group(1)`, `.group(2)` etc. in the match object
+- recall captured elements with `\1`, `\2` etc. in a regular expression, to use them in a replacement for example
+
+```Python
+re.sub(r'^(\w)\w+-(\d+)\.csv', r'\1\2.csv', filenames[0]) # search for starting with something that's a word character, capture it, then any # of word characters, then dash, then digits 1 or more, capture it, then a real dot, then csv. replace with first letter,digit, and csv. 
+
+for i in range(0,len(filenames)): # do the above for all filenames in place 
+    filenames[i] = re.sub(r'^(\w)\w+-(\d+)\.csv', r'\1\2.csv', filenames[i])
+print(filenames)
+
+taxa = ["Drosophila melanogaster", "Homo sapiens"]
+for taxon in taxa:
+    mo = re.search(r'^([^\s]+) ([^\s]+)$', taxon)
+    if mo:
+        genus = mo.group(1) # get the first thing we captured
+        species = mo.group(2) # get the second thign we captured 
+        print("genus=" + genus + ", species=" + species) # put them together
+
+print(taxon)
+print(mo) # variables defined inside "for" are available outside
+print(mo.start(1))
+print(mo.start(2))
+
+taxa_abbrev = [] # make an empty list 
+for taxon in taxa: # loop over taxa 
+    taxa_abbrev.append( # append a new item to the empty list 
+        re.sub(r'^(\S).* ([^\s]+)$', r'\1_\2', taxon) # substitute anything that is not a space, anything in between space and anything, replace this by capture stuffs
+    )
+print(taxa_abbrev)
+```
+This strategy is good - start with an empty list and build it up with the `append` function. 
+
+## scope of variables 
+
+Main session
+- filenames
+- a = "hello world" 
+
+Function, foo
+- a = 7, did function a = 18 
+
+But outside of the function, a still equals "hello world" 
+These variables are not related to each other. They persist within their own name-spaces. 
+
+## split according to a regex
+
+- removes the matched substrings
+- returns an array 
+
+```Python
+coolstring = "Homo sapiens is pretty super"
+re.split(r's.p', coolstring) # split function from re module to split with a regex 
+re.split(r's.*p', coolstring) # split with an s, a character, and a p, then add the coolstring 
+re.split(r's.*?p', coolstring)
+```
+
+An array is like a list, but you can only perform certain functions on it. It's not like a dictionary that has a key/value pair. Use arrays when you want to do arithmetic on the elements within the collection of items. An array is like a more complicated list. 
+
+Homework: 
+- Do the next three Python sections. 
+    - creating functions
+    - errors and exceptions
+    - defensive programming 
+
+# 2018-10-29, Python Functions
+
+```Python
+def function_name(arguments):
+    """docstring here: to explain what the function does"""
+    command indented
+    indented command
+    return value # returns None if no return statement
+```
+
+```Python
+def foo(arg1, arg2=0):
+  """
+  Return arg1 -1 + arg2. # this much documentation is normal 
+  arg2 is optional, 0 by default.
+  good practice: include examples.
+  Examples: # it's really good to provide examples, you can use this later to test your code to make sure it's working as expected 
+
+  >>> foo(5)
+  4
+  >>> foo(5,8)
+  12
+  >>> foo(5, arg2=2)
+  6
+  """
+  assert type(arg1)==int, "error message: here arg1 should be an integer"
+  res = arg1 - 1 + arg2
+  return res
+```
+
+Another example: 
+
+```Python
+def startswithi(str):
+    """Return True if the input string starts with 'i', False otherwise.
+    Require that the "re" was imported beforehand.
+
+    # document assumptions 
+    notes:
+    - the double and single quotes inside my tripe double-quoted docstring
+    - in my text here the indentation adds 4 spaces on each line.
+      Those are ignored because it's a triple set of quotes.
+
+    Example:
+
+    >>> startswithi("hohoho")
+    False
+    """
+    return(bool(re.search(r'^i', str)))
+
+help(startswithi) # or ?startswithi in interactive session
+print(startswithi("iamcecile"))
+print(startswithi("hohoho"))
+```
+Triple quotes = docstrings. This is not specific to Python. 
+
+key principle: break problem down into small parts
+write functions
+- if you do some “copy-paste” of your code: you need to write a function
+- functions make your code easier to debug, easier to read
+- use meaningful names for functions and for variables
+
+```Python
+def fahr_to_kelvin(temp):
+    return ((temp - 32) * (5/9)) + 273.15
+
+print('freezing point of water:', fahr_to_kelvin(32))
+print('boiling point of water:', fahr_to_kelvin(212))
+
+def kelvin_to_celsius(temp_k):
+    return temp_k - 273.15
+
+print('absolute zero in Celsius:', kelvin_to_celsius(0.0))
+
+def fahr_to_celsius(temp_f):
+    temp_k = fahr_to_kelvin(temp_f)
+    result = kelvin_to_celsius(temp_k)
+    return result
+
+print('freezing point of water in Celsius:', fahr_to_celsius(32.0))
+```
+**Anytime you find yourself copy/pasting, you should be writing a function. Down the road, it pays off. Keep this in mind. 
+
+Exaple to breakdown: 
+```Python
+import numpy
+import glob
+import matplotlib
+filenames = glob.glob('inflammation*.csv')
+
+def analyze_all():
+  for f in filenames[:3]:
+    print(f)
+    analyze(f)
+    detect_problems(f)
+
+def analyze(filename):
+    data = numpy.loadtxt(fname=filename, delimiter=',')
+    # commands to make the figure for one data file
+
+def detect_problems(filename):
+    data = numpy.loadtxt(fname=filename, delimiter=',')
+    if (numpy.max(data, axis=0)[0] == 0 and
+        numpy.max(data, axis=0)[20] == 20):
+        print('Suspicious looking maxima!')
+    elif numpy.sum(numpy.min(data, axis=0)) == 0:
+        print('Minima add up to zero!')
+    else:
+        print('Seems OK!')
+
+analyze_all()
+```
+
+Write things from global to more detailed. Cecile thinks it helps to have the big picture first. Eg. how the above script is set up where you see okay, I am going to print the filename, then analyze the files, and finally detect any problems. 
+
+in-class exercise: binomial coefficients
+
+goals: 
+- write functions, divide a large problem into smaller problems
+- use optional arguments and default argument values
+- use loops and `if` statements
+- use docstring to document functions
+- check for assumptions
+- test code automatically
+- create a module: use the script to be run on the command line, or as a module
+
+Calculate binomia coefficients is not easy numerically. 
+
+Calculating binomial coefficients is not easy numerically. The number of ways to choose k elements among n is `choose(n,k) = n! / (k! (n-k)!)` where factorial n: `n! = 1*2*...*n` becomes very big very fast. But many terms cancel each other in “n choose k”, and it is a lot easier numerically to calculate the log factorial: `log(n!) = log(1) + ... + log(n)`.
+
+1. Write a function “logfactorial” that calculates `log(n!)` for any integer `n>0`. Hint: use `math.log()` to calculate the log of a single value, and use a loop to iterate over `i` and get the `log(i)` values.
+2. Add a docstring
+3. Add checks on the input `n` (should be an integer, and non-negative)
+4. Add tests as examples inside the docstring. For the tests to be used, add a section using the doctest module. Check that you can run the checks with `./binomial.py --test`
+5. Add an optional argument `k` to calculate `log(n!/k!) = log((k+1)*...*n) = log(k+1) + ... + log(n)`, with default `k=0`. Return log(1)=0 if k>n, with no error (it’s a sum of 0 terms).
+6. Add a check that `k` is a non-negative integer
+7. Add examples to test the function with a non-default `k`, for instance: with n=5 and some k<5, also n=k=5 (boundary), and n=5, k=6.
+8. Write a function “choose” to calculate the log of the binomial `log(choose(n,k))` for any integers `n>=0` and `0 <= k <= n`. Start with the docstring and with a test. Recall that `choose(n,k) = n!/(k! (n-k)!)`, so `log(choose(n,k)) = log(n!/k!) - log((n-k)!)` and you can use the function from step 5 twice.
+9. Add an optional argument to this `choose` function, to return either the binomial coefficient itself (as an integer) or its log (as a `float`). Make the function return the binomial coefficient by default, not its log.
+10. Add a docstring for the module itself
+11. Add arguments for the script itself, to be able to run it like this for instance: `./binomial.py -n 100 -k 30` or `./binomial.py -n 1000 -k 300 --log`
+
+Try for next time to do 1 through 5. Go through my script again and go through two more software carpentry sessions. Also, try to write the next function. Also, try to get my functions to run and try my test function thing. I'll go through the lecture notes, update this document and commit everything to GitHub before next class. 
+
+# 2018-10-31, python functions and scripts continued 
+
+Submit binomial code on GitHub. I don't think this will be graded formally. 
+
+Strongly recommended to use to argparse library. 
+
+```Python
+#!/usr/bin/env python
+"""module with very cool functions to say 'hi'"""
+
+import argparse # first need to import this library 
+# use an Argument Parser object to handle script arguments
+parser = argparse.ArgumentParser() # create an object of library ArgumentParser
+parser.add_argument("-n", type=int, help="number of times to say hi") # will take care of error messages, if n is not an integer
+parser.add_argument("-l", "--long", action="store_true", help="whether to say 'hi' the long way") # default will be off
+parser.add_argument("-g", "--greetings", type=str, help="greeting message, like a name")
+parser.add_argument("--test", action="store_true", help="tests the module and quits")
+args = parser.parse_args() # call a function on this object that will create a new object (args)
+hi = "Howdy" if args.long else "Hi" # howdy if args.long is true, otherwise hi = HI 
+
+# test argument problems early:
+if not args.test and __name__ == '__main__': # __name__ is predefined in python, used to check if you are running the file as a script, vs importing the file as a module as a part of something bigger 
+    if args.n<0: # assert is a better way to throw an error 
+        raise Exception("argument -n must be 0 or positive") # raise is a very generic way of raising an error 
+    # no error if file imported as module
+
+def print_greetings(extra_greetings, n=args.n):
+    """
+    print individualized greeting. example:
+    >>> print_greetings("have a good day", 0)
+    have a good day, you.
+    """
+    s = ""
+    for i in range(0,n):
+        s += hi + ", "
+    if extra_greetings:
+        s += extra_greetings + ", "
+    s += args.greetings if args.greetings else "you"
+    s += "."
+    print(s)
+
+def runTests():
+    print("testing the module...")
+    if args.n:
+        print("ignoring n for testing purposes")
+    import doctest
+    doctest.testmod()
+    print("done with tests.")
+
+if __name__ == '__main__':
+    if args.test:
+        runTests()
+    else:
+        print_greetings("")
+```
+
+I worked on creating this binomial module in class: 
+
+```Python
+#!/usr/bin/env python
+import math 
+import argparse
+# use an Argument Parser object to handle script arguments
+import doctest
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-n", type=int, help="total number of items to choose from")
+parser.add_argument("-k", type=int, help="number of items to choose")
+parser.add_argument("--log", action="store_true", help="returns the log of the binomical coefficient")
+parser.add_argument("--test", action="store_true", help="tests the module and quits")
+args = parser.parse_args()
+
+def logfac(n, k=0): # default value of k = 0 
+    """Return the log factorial `log(n!)` for any integer `n>0`.
+
+    Examples: 
+
+    >>> round(logfac(5),2)
+    4.79
+    >>> round(logfac(0),2)
+    0
+    >>> round(logfac(5,3),2)
+    3.0
+    >>> round(logfac(5,5),2)
+    0
+    >>> round(logfac(6,5),2)
+    1.79
+    
+    Notes: 
+
+    """
+    assert type(n)==int, "error message: here n should be an integer"
+    assert type(k)==int, "error message: here n should be an integer"
+    assert n >= 0, "error message: n must be great than or equal to zero"
+    assert k >= 0, "error message: k must be greater than or equal to zero"
+
+
+    result = 0
+
+    for i in range(k,n):
+        result += math.log(i+1) # to start with k (or 1 if k = 0)
+    return result
+
+# print(round(logfac(5),2))
+# print(round(logfac(0),2))
+# print(round(logfac(5,3),2))
+# print(round(logfac(5,5),2))
+# print(round(logfac(6,5),2))
+
+def choose(n,k,log=False): 
+    """Calculate the log of a binomial `log(choose(n,k))` for any integers `n>=0` and `0 <= k <= n`.
+    choose(n,k) = n!/(k! (n-k)!) so log(choose(n,k)) = log(n!/k!) - log((n-k)!)
+
+    Examples: 
+
+    >>> round(choose(4,1),2)
+    4
+    
+    >>> round(choose(5,3,True),2)
+    2.3
+
+    >>> round(choose(5,3,False),2)
+    10
+
+    Notes:
+    """
+    
+    assert type(n)==int, "error message: here n should be an integer"
+    assert n >= 0, "error message: n must be great than or equal to zero"
+    assert type(k)==int, "error message: here n should be an integer"
+    assert (k >= 0) and (k <= n), "error message: k must be greater than or equal to zero and k must be less than or equal to n"
+    
+    if log: 
+        return(logfac(n,k) - logfac(n - k))
+    else:
+        return(round(math.exp(logfac(n,k) - logfac(n - k))))
+
+def runTests():
+    print("testing the module...")
+    import doctest
+    doctest.testmod()
+    print("done with tests.")
+
+if __name__ == '__main__':
+    if args.test:
+        runTests()
+    else:
+        print(choose(args.n, args.k, args.log))
+```

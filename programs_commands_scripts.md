@@ -675,3 +675,465 @@ Key points:
 - `X or Y` is true if either `X` or `Y`, or both, are true. 
 - Zero, the empty string, and the empty list are considered false; all other numbers, strings, and lists are considered true. 
 - `True` and `False` represent truth values. 
+
+### Creating functions 
+
+We'd like a way to package our code so that it is easier to reuse, and Python provides for this by letting us define things called 'functions' – a shorthand way of re-executing longer pieces of code. 
+
+```Python
+def fahr_to_celsius(temp):
+    return ((temp - 32) * (5/9))
+```
+
+Wehen we call the function,the values we pass to it are assigned to those variables so that we can use them inside the function. Inside the function, we use a return statement to send a result back to whoever asked for it. 
+
+```Python
+def fahr_to_kelvin(temp_f):
+    temp_c = fahr_to_celsius(temp_f)
+    temp_k = celsius_to_kelvin(temp_c)
+    return temp_k
+
+print('boiling point of water in Kelvin:', fahr_to_kelvin(212.0))
+```
+
+The usual way to put documentation in software is to add comments like this: 
+```Python 
+# offset_mean(data, target_mean_value):
+# return a new array containing the original data with its mean offset to match the desired value.
+def offset_mean(data, target_mean_value):
+    return (data - numpy.mean(data)) + target_mean_value
+```
+
+Here is the beginning of a function: 
+```Python
+loadtxt(fname, dtype=<class 'float'>, comments='#', delimiter=None, converters=None, skiprows=0, use
+cols=None, unpack=False, ndmin=0, encoding='bytes')
+```
+This tells us that `loadtext` has one parameter called `fname` that doesn't have a default value, and eight others that do. We can call the function like this: 
+```Python
+numpy.loadtxt('inflammation-01.csv', ',')
+```
+then the filename is assigned to `fname`, but the delimiter string `','`is assigned to `dype` rather than `delimiter`, because `dype` is the second parameter in the list. However, `','` isn't a known `dtype` so our code produced an error message when we tried to run it. When we call `loadtxt` we don't have to provide `fname=` for the filename because it's the first item in the list, but if we want the `','` to be assigned to the variable `delimiter`, we do have to provide `delimiter=` for the second parameter since `delimiter`is not the second parameter in the list. 
+
+Choosing varaible names and using blank spaces to breakt he code into logical "chunks" are helpful techniques for producing readable code. 
+
+Note that `return` and `print` are not interchangeable. `print` is a Python function that *prints* data to the screen. It enables us, users, to see data. `return` makes data visible to the program. 
+
+
+If the variable `s` refers to a string, then `s[0]` is the string’s first character and `s[-1]` is its last.
+
+```Python
+def outer(input_string):
+    return input_string[0] + input_string[-1]
+```
+Key points: 
+- define a function using `def function_name(parameter)`
+- the body of a function must be indented
+- call a function using `function_name(value)`
+- numbers are stored as integers or floating-point numbers
+- variables defined within a function can only be seen and used within teh body of the function 
+- if a variable is not defined within the function it is used, Python looks for a defintion before the function call 
+- use `help(thing)` to view help for something 
+- put docstrings in functions to provide help for that function
+- specify default values for parameters when defining a function using `name=value` in the parameter list
+- parameters can be passed by matching based on name, position, or by omitting them (in which case the default value is used)
+- put code whose parameters change frequently in a function, then call it with a different parameter values to customize behavior 
+
+### Errors and exceptions 
+
+Most of the time, you can just pay attention to the bottom-most level, which is the actual place where the error occurred. If you encounter an error and don’t know what it means, it is still important to read the traceback closely. That way, if you fix the error, but encounter a new one, you can tell that the error changed. Additionally, sometimes just knowing where the error occurred is enough to fix it, even if you don’t entirely understand the message.
+
+Some indentation errors are harder to spot than others. In particular, mixing spaces and tabs can be difficult to spot because they are both whitespace. In the example below, the first two lines in the body of the function some_function are indented with tabs, while the third line — with spaces. If you’re working in a Jupyter notebook, be sure to copy and paste this example rather than trying to type it in manually because Jupyter automatically replaces tabs with spaces.
+
+Note: Jupyter automatically replaces tabs with spaces. 
+
+Another very common type of error is called a `NameError`, and occurs when you try to use a variable that does not exist.
+
+Next up are errors having to do with containers (like lists and strings) and the items within them. If you try to access an item in a list or a string that does not exist, then you will get an error.
+
+The last type of error we’ll cover today are those associated with reading and writing files: `FileNotFoundError`. If you try to read a file that does not exist, you will receive a `FileNotFoundError` telling you so. If you attempt to write to a file that was opened read-only, Python 3 returns an `UnsupportedOperationError`. More generally, problems with input and output manifest as `IOErrors` or `OSErrors`, depending on the version of Python you use.
+
+Key points: 
+- tracebacks can look intimidating, but they give us a lof of useful info about what went wrong in our program, including where the error occured and what type of error it was
+- an error having to do with the 'grammar' or 'syntax' of a program is called `syntaxError`. If the issue has to do with how the code is indented, then it will be called an `IndentationError` 
+- a `NameError` will occur if you use a variable that has not been defined, either because you meant to use quotes around a string, you forgot to define the variable, or you just made a typo 
+- containers like lists and strings will generate errors if you try to access items in them that do not exit. This type of error is called an `Indexerror`
+- Trying to read a file that does not exist will give you an `FileNotFoundError`. Trying to read a file that is open for writing, or writing to a file that is open for reading, will give you an `IOError` 
+
+### Defensive programming 
+
+- write programs that check their own operation
+- write and run tests for widely-used functions
+- make sure we know what "correct" actually means 
+
+**Assertion**: a simple statemtne that somethign must be true at a certain point in a program. If true, Python does nothing, but if false, Python halts the program immediately and pritns the error message if one is provided. Broadly speaking, assertions fall into three categories: 
+1. A precondition is something that must be true at the start of a function in order for it to work correctly. 
+2. A postcondition is something that the function garantees is true when it finishes. 
+3. An invariant is somethign that is always true at a particular point inside a piece of code. 
+
+For example, suppose we are representing rectangles using a `tuple` of four coordinates `(x0, y0, x1, y1)`, representing the lower left and upper right corners of the rectangle. In order to do some calculations, we need to normalize the rectangle so that the lower left corner is at the origin and the longest side is 1.0 units long. This function does that, but checks that its input is correctly formatted and that its result makes sense:
+
+```Python
+def normalize_rectangle(rect):
+    '''Normalizes a rectangle so that it is at the origin and 1.0 units long on its longest axis.
+    Input should be of the format (x0, y0, x1, y1).
+    (x0, y0) and (x1, y1) define the lower left and upper right corners
+    of the rectangle, respectively.'''
+    assert len(rect) == 4, 'Rectangles must contain 4 coordinates'
+    x0, y0, x1, y1 = rect
+    assert x0 < x1, 'Invalid X coordinates'
+    assert y0 < y1, 'Invalid Y coordinates'
+
+    dx = x1 - x0
+    dy = y1 - y0
+    if dx > dy:
+        scaled = float(dx) / dy
+        upper_x, upper_y = 1.0, scaled
+    else:
+        scaled = float(dx) / dy
+        upper_x, upper_y = scaled, 1.0
+
+    assert 0 < upper_x <= 1.0, 'Calculated upper X coordinate invalid'
+    assert 0 < upper_y <= 1.0, 'Calculated upper Y coordinate invalid'
+
+    return (0, 0, upper_x, upper_y)
+```
+
+    1. Fail early adn fail often.
+    2. Turn bugs into assertions or tests. 
+
+Writing the tests *before* writing the function = *test-driven development (TDD)*.
+1. If people write tests after writing teh thing to be tested, they are subject to confirmation bias, i.e., they subconsciously write tests to show that their code is correct, rather than to find errors. 
+2. Writing tests helps programmers figure out what the function is actually supposed to do. 
+
+Key points: 
+- Program defensively, i.e., assume that errors are going to arise, and write code to detect them when they do.
+- Put assertions in programs to check their state as they run, and to help readers understand how those programs are supposed to work.
+- Use preconditions to check that the inputs to a function are safe to use.
+- Use postconditions to check that the output from a function is safe to use.
+- Write tests before writing code in order to help determine exactly what that code is supposed to do.
+
+Fixed `range_overlap`: 
+```Python
+import numpy
+
+def range_overlap(ranges):
+    '''Return common overlap among a set of [low, high] ranges.'''
+    if not ranges:
+        # ranges is None or an empty list
+        return None
+    lowest, highest = ranges[0]
+    for (low, high) in ranges[1:]:
+        lowest = max(lowest, low)
+        highest = min(highest, high)
+    if lowest >= highest:  # no overlap
+        return None
+    else:
+        return (lowest, highest)
+```
+
+### Debugging 
+
+1. *Test with simplified data*. Before doing stats on a real data set, we should try calculating stats for a single record, for two identical records, for two records whose values are one step apart, or for some other case where we can calculate the right answer by hand. 
+2. *Test a simplified case*. 
+3. *Compare to an oracle*. A test oracle is somethign whose results are trusted, such as experimental data, an older program, or a human expert. 
+3. *Check conservation laws*. Make sure the program isn't altering raw data files. 
+4. *Visualize*. Data analysts frequency use simple visualizations to check both the science they're doing and the correctness of their code. 
+
+Find a test case that makes it fail every time. 
+Localize the failure to the smallest possible region of code: 
+1. The smaller the gap between cause and effect, the easier the connection is to find. Many programmers therefore use a divide and conquer strategy to find bugs, i.e., if the output of a function is wrong, they check whether things are OK in the middle, then concentrate on either the first or second half, and so on. 
+2. N things can interact in N^2 different ways, so every line of code isn't run as part of a test means more than one thing we don't need to worry about. 
+
+Change one thing at a time. The more things we change at once, the harder it is to know what's responsible for what. 
+
+Good scientists keep track of what they've done so that they can reproduce their work, and so that they don't waste time repeating the same experimetns or running ones whose resutls won't be interesting. If we can't find a bug in 10 mins, be humble and ask for help. Asking for help also helps to alleviate confirmation bias. 
+
+Debugging example: 
+```Python
+patients = [[70, 1.8], [80, 1.9], [150, 1.7]]
+
+def calculate_bmi(weight, height):
+    return weight / (height ** 2)
+
+for patient in patients:
+    weight, height = patients[0] # I don't know how to correct this so the height/weight are not always set as the first patient's data during each iteration of the loop. 
+    bmi = calculate_bmi(weight, height)
+    print("Patient's BMI is: %f" % bmi)
+```
+
+### Command-line programs
+
+The Jupyter Notebook and other interactive tools are great for prototyping code and exploring data, but sooner or later we will want to use our program in a pipeline or run it in a shell script to process thousands of data files. In order to do that, we need to make our programs work like other Unix command-line tools.
+
+To make this work, we have to tackle command-line arguments. 
+
+```Python
+import sys
+import numpy
+
+def main():
+    script = sys.argv[0]
+    filename = sys.argv[1]
+    data = numpy.loadtxt(filename, delimiter=',')
+    for m in numpy.mean(data, axis=1):
+        print(m)
+
+if __name__ == '__main__':
+   main()
+```
+
+In order for a Python script to work as expected when imported or when run as a script, we typically put the part of the script that produces output in the following if statement: 
+
+```Python
+if __name__ == '__main__':
+    main() # Or whatever function produces output
+```
+
+When you import a Python file, `__name__` is the name of that file (e.g., when importing `readings.py`, `__name__` is `__readings__`). However, when running a script in bash, `__name__` is always set to `__main__` in that script so that you can determine if the file is being imported or run as a script. 
+
+I am kinda confused about this. 
+
+If our programs can take complex parameters or multiple filenames, we shouldn't handle `sys.argv` directly. Instead, we should use Python's `argparse` library, which handles common cases in a systematic way, and also makes it easy for use to provide sensible error messages for our users.
+
+Next, we need to teach out program how to handle mulitple files. We need a loop that executes once for each filename. If we specify the files on the command line, the filenames will be in `sys.argv`, but we need to be careful: `sys.argv[0]` will always be the name of our script, rather than the name of a file. We also need to handle an unknown number of filenames, since our program could be run for any number of files. The solution to both problems is to loop over the contents of `sys.argv[1:]`. The '1' tells Python to start the slice at location 1, so the program' name isn't included; since we've left off the upper bound, the slice runs to the end of the list, and includes all filenames. 
+
+At this point, we've created 3 versions of our script. The better way to do this is to have one file that we've committed to version control. 
+1. `main` is too large to read comfortably.
+2. If we do not specify at least two additional arguments on the command-line, one for the flag and one for the filename, but only one, the program will not throw an exception but will run. It assumes that the file list is empty, as `sys.argv[1]` will be considered the `action`, even if it is a filename. *Silent failures* like this are always hard to debug.
+3. The program should check if the submitted `action` is one of the three recognized flags.
+
+```Python
+import sys
+import numpy
+
+def main():
+    script = sys.argv[0]
+    action = sys.argv[1]
+    filenames = sys.argv[2:]
+    assert action in ['--min', '--mean', '--max'], \
+           'Action is not one of --min, --mean, or --max: ' + action
+    for f in filenames:
+        process(f, action)
+
+def process(filename, action):
+    data = numpy.loadtxt(filename, delimiter=',')
+
+    if action == '--min':
+        values = numpy.min(data, axis=1)
+    elif action == '--mean':
+        values = numpy.mean(data, axis=1)
+    elif action == '--max':
+        values = numpy.max(data, axis=1)
+
+    for m in values:
+        print(m)
+
+if __name__ == '__main__':
+   main()
+```
+
+The next thing our program has to do is read data from standard input if no filenaems are give so that we can put it in a pipeline, redirect intput to it, and so on. 
+
+```Python
+import sys
+import numpy
+
+def main():
+    script = sys.argv[0]
+    action = sys.argv[1]
+    filenames = sys.argv[2:]
+    assert action in ['--min', '--mean', '--max'], \
+           'Action is not one of --min, --mean, or --max: ' + action
+    if len(filenames) == 0:
+        process(sys.stdin, action) # this is the addition 
+    else:
+        for f in filenames:
+            process(f, action)
+
+def process(filename, action):
+    data = numpy.loadtxt(filename, delimiter=',')
+
+    if action == '--min':
+        values = numpy.min(data, axis=1)
+    elif action == '--mean':
+        values = numpy.mean(data, axis=1)
+    elif action == '--max':
+        values = numpy.max(data, axis=1)
+
+    for m in values:
+        print(m)
+
+if __name__ == '__main__':
+   main()
+```
+
+Write a command-line program that does addition and subtraction: 
+
+```Python
+import sys
+
+def main():
+    assert len(sys.argv) == 4, 'Need exactly 3 arguments'
+
+    operator = sys.argv[1]
+    assert operator in ['add', 'subtract', 'multiply', 'divide'], \ `Operator is not one of add, subtract, multiply, or divide: bailing out'
+    try: 
+        operand1, operan2 = float(sys.argv[2]), float(sys.argv[3])
+    except ValueError: 
+        print('cannot convert input to a number: bailing out')
+        return
+    
+    do_arithmetic(operan1, operator, operand2)
+
+def do_arithmetic(operand1, operator, operand2):
+
+    if operator == 'add':
+        value = operand1 + operand2
+    elif operator == 'subtract':
+        value = operand1 - operand2
+    elif operator == 'mulitply':
+        value = operand1 * operand2
+    elif operator == 'divide':
+        value = operand1 / operand2
+    print(value)
+
+main()
+```
+
+Using the `glob` module introduced earlier, write a simple version of `ls` that shows files in the current directory with a particular suffix.
+
+```Python
+import sys
+import glob
+
+def main():
+    '''prints names of all files with sys.argv as suffix'''
+    assert len(sys.argv) >= 2, 'Argument list cannot be empty'
+    suffix = sys.argv[1] # NB: behavior is not as you'd expect if sys.argv[1] is *
+    glob_input = '*.' + suffix # construct the input
+    glob_output = sorted(glob.glob(glob_input)) # call the glob function 
+    for item in glob_output: # print the output
+        print(item)
+    return
+
+main()
+```
+
+Add a default action so that if no action is given, it displays the means of the data: 
+```Python
+import sys
+import numpy
+
+def main():
+    script = sys.argv[0]
+    action = sys.argv[1]
+    if action not in ['--min', '--mean', '--max']: # if no action given
+        action = '--mean'    # set a default action, that being mean
+        filenames = sys.argv[1:] # start the filenames one place earlier in the argv list
+    else:
+        filenames = sys.argv[2:]
+
+    if len(filenames) == 0:
+        process(sys.stdin, action)
+    else:
+        for f in filenames:
+            process(f, action)
+
+def process(filename, action):
+    data = numpy.loadtxt(filename, delimiter=',')
+
+    if action == '--min':
+        values = numpy.min(data, axis=1)
+    elif action == '--mean':
+        values = numpy.mean(data, axis=1)
+    elif action == '--max':
+        values = numpy.max(data, axis=1)
+
+    for m in values:
+        print(m)
+
+main()
+```
+
+Write a program called `check.py` that takes the names of one or more inflammation data files as arguments and checks that all the files have the same number of rows and columns.
+
+```Python
+import sys
+import numpy
+
+def main():
+    script = sys.argv[0]
+    filenames = sys.argv[1:]
+    if len(filenames) <=1: # nothing to check
+        print('Only 1 file specific on input')
+    else: 
+        nrow0, ncol0 = row_col_count(filenames[0])
+        print('First file %s: %d rows and %d columns' % (filenames[0]nrow0, ncol0))
+        for f in filenames[1:]:
+            nrow, ncol = row_col_count(f)
+            if nrow != nrow0 or ncol != ncol0: 
+                print('File %s does not check: %d rows and %d columns' % (f, nrow, ncol))
+            else: 
+                print('File %s checks' % f)
+            return
+
+def row_col_count(filename):
+    try:
+        nrow, ncol = numpy.loadtxt(filename, delimiter=',').shape
+    except ValueError:
+        # 'ValueError' error is raised when numpy encounters lines that 
+        # have different number of data elements in them than the rest of teh lines, 
+        # or when lines have non-numeric elements
+        nrow, ncol = (0,0)
+        return nrow, ncol
+
+main()
+```
+
+Write a program called `line_count.py` tha tworks like the Unix `wc` command: 
+- If no filenames are given, it reports the number of lines in standard input.
+- If one or more filenames are given, it reports the number of lines in each, followed by the total number of lines.
+
+```Python
+import sys
+
+def main():
+    '''print each input filename and the number of lines in it,
+       and print the sum of the number of lines'''
+    filenames = sys.argv[1:]
+    sum_nlines = 0 #initialize counting variable
+
+    if len(filenames) == 0: # no filenames, just stdin
+        sum_nlines = count_file_like(sys.stdin)
+        print('stdin: %d' % sum_nlines)
+    else:
+        for f in filenames:
+            n = count_file(f)
+            print('%s %d' % (f, n))
+            sum_nlines += n
+        print('total: %d' % sum_nlines)
+
+def count_file(filename):
+    '''count the number of lines in a file'''
+    f = open(filename,'r')
+    nlines = len(f.readlines())
+    f.close()
+    return(nlines)
+
+def count_file_like(file_like):
+    '''count the number of lines in a file-like object (eg stdin)'''
+    n = 0
+    for line in file_like:
+        n = n+1
+    return n
+
+main()
+```
+
+Key points: 
+- The `sys` library connects a Python program to the system it is running on.
+- The list `sys.argv` contains the command-line arguments that a program was run with.
+- Avoid silent failures.
+- The pseudo-file `sys.stdin` connects to a program’s standard input.
+- The pseudo-file `sys.stdout` connects to a program’s standard output.
